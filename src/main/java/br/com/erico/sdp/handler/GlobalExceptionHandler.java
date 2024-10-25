@@ -1,11 +1,13 @@
 package br.com.erico.sdp.handler;
 
 import br.com.erico.sdp.dto.FieldErrorResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -23,8 +25,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<FieldErrorResponse> handleBadRequest(NoSuchElementException ex) {
+    public ResponseEntity<Void> handleBadRequest(NoSuchElementException ex) {
         return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<Void> handleConflict(SQLIntegrityConstraintViolationException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
 }
