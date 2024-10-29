@@ -1,13 +1,14 @@
 package br.com.erico.sdp.handler;
 
 import br.com.erico.sdp.dto.FieldErrorResponse;
+import br.com.erico.sdp.exception.DataLimiteExpiradaException;
+import br.com.erico.sdp.exception.NumeroProjetoExistenteException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -25,13 +26,18 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Void> handleBadRequest(NoSuchElementException ex) {
+    public ResponseEntity<Void> handleBadRequest() {
         return ResponseEntity.badRequest().build();
     }
 
-    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
-    public ResponseEntity<Void> handleConflict(SQLIntegrityConstraintViolationException ex) {
+    @ExceptionHandler({NumeroProjetoExistenteException.class})
+    public ResponseEntity<Void> handleConflict() {
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
+
+    @ExceptionHandler({DataLimiteExpiradaException.class})
+    public ResponseEntity<Void> handlePreconditionFailed() {
+        return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
     }
 
 }

@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
+
 public record ProjetoRequest(
         @NotBlank(message = "Nome é obrigatório")
         String nome,
@@ -20,7 +21,7 @@ public record ProjetoRequest(
         String numero,
 
         @NotBlank(message = "Modalidade é obrigatória")
-        @Pattern(regexp = "(Ensino|Pesquisa|Extensão)", message = "Modalidade deve ser Ensino, Pesquisa ou Extensão")
+        @Pattern(regexp = "Ensino|Pesquisa|Extensão", message = "Modalidade deve ser Ensino, Pesquisa ou Extensão")
         String modalidade,
 
         @NotBlank(message = "Justificativa é obrigatória")
@@ -34,6 +35,9 @@ public record ProjetoRequest(
         @NotNull(message = "ID do eixo tecnológico é obrigatório")
         Long eixoTecnologicoId
 ) {
+    public ProjetoRequest {
+        nome = nome.toUpperCase();
+    }
 
     public Projeto toEntity(Long usuarioId) {
         return Projeto.builder()
@@ -43,10 +47,10 @@ public record ProjetoRequest(
                 .justificativa(justificativa)
                 .impactosAmbientais(impactosAmbientais)
                 .eixoTecnologico(EixoTecnologico.builder().id(eixoTecnologicoId).build())
-                .usuario(Usuario.builder().id(usuarioId).build())
                 .dataCriacao(LocalDate.now())
                 .ano(LocalDate.now().getYear())
                 .status(StatusProjeto.NAO_FINALIZADO)
+                .usuario(Usuario.builder().id(usuarioId).build())
                 .build();
     }
 

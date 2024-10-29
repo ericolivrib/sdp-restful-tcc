@@ -10,5 +10,6 @@ import java.util.List;
 public interface ProjetoRepository extends JpaRepository<Projeto, Long> {
 
     List<Projeto> findAllByUsuarioId(Long usuarioId);
+    boolean existsByNumero(String numero);
 
 }
