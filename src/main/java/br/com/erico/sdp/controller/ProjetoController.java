@@ -39,7 +39,6 @@ public class ProjetoController {
         return ResponseEntity.created(projetoLocation).build();
     }
 
-    @Transactional
     @GetMapping("/usuarios/{usuarioId}/projetos")
     public ResponseEntity<List<ProjetoResponse>> getProjetosByUsuario(@PathVariable("usuarioId") Long usuarioId) {
         var projetos = projetoService.getProjetosByUsuario(usuarioId);
