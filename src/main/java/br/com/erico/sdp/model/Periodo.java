@@ -1,5 +1,8 @@
 package br.com.erico.sdp.model;
 
+import lombok.Getter;
+
+@Getter
 public enum Periodo {
 
     SUBMISSAO_PROJETOS(1, "Submissão de projetos"),
@@ -14,14 +17,6 @@ public enum Periodo {
     Periodo(int id, String nome) {
         this.id = id;
         this.nome = nome;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getNome() {
-        return nome;
     }
 
 }
