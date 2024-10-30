@@ -8,6 +8,9 @@ import br.com.erico.sdp.service.DataLimiteService;
 import br.com.erico.sdp.service.ProjetoService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -26,7 +29,7 @@ public class ProjetoController {
     }
 
     @Transactional
-    @PostMapping("/usuarios/{usuarioId}/projetos")
+    @PostMapping(path = "/usuarios/{usuarioId}/projetos", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> adicionarProjeto(@RequestBody @Valid ProjetoRequest request,
                                                  @PathVariable("usuarioId") Long usuarioId,
                                                  UriComponentsBuilder uriBuilder) {
@@ -39,10 +42,39 @@ public class ProjetoController {
         return ResponseEntity.created(projetoLocation).build();
     }
 
-    @GetMapping("/usuarios/{usuarioId}/projetos")
-    public ResponseEntity<List<ProjetoResponse>> getProjetosByUsuario(@PathVariable("usuarioId") Long usuarioId) {
+    @GetMapping(path = "/usuarios/{usuarioId}/projetos", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CollectionModel<EntityModel<ProjetoResponse>>> getProjetosByUsuario(@PathVariable("usuarioId") Long usuarioId) {
         var projetos = projetoService.getProjetosByUsuario(usuarioId);
-        return ResponseEntity.ok(projetos);
+        return ResponseEntity.ok(ProjetoResponse.toCollectionModel(projetos, usuarioId));
+    }
+
+    /* Outros métodos */
+
+    @GetMapping("/projetos/{id}")
+    public ResponseEntity<ProjetoResponse> getProjetosById(@PathVariable("id") Long id) {
+        ProjetoResponse projeto = projetoService.getProjetoById(id);
+        return ResponseEntity.ok(projeto);
+    }
+
+    @PutMapping("/projetos/{id}")
+    public ResponseEntity<Void> atualizarProjeto(@PathVariable("id") Long projetoId, @RequestBody ProjetoRequest request) {
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/projetos/{id}")
+    public ResponseEntity<Void> finalizarProjeto(@PathVariable("id") Long id) {
+        projetoService.finalizarProjeto(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/projetos/{id}")
+    public ResponseEntity<Void> deletarProjeto(@PathVariable("id") Long projetoId) {
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/projetos/{id}/relatorio")
+    public ResponseEntity<byte[]> gerarRelatorio(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(new byte[]{});
     }
 
 }
