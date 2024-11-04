@@ -1,7 +1,6 @@
 package br.com.erico.sdp.service;
 
-import br.com.erico.sdp.dto.ProjetoRequest;
-import br.com.erico.sdp.dto.ProjetoResponse;
+import br.com.erico.sdp.dto.ProjetoFromUsuarioDTO;
 import br.com.erico.sdp.exception.NumeroProjetoExistenteException;
 import br.com.erico.sdp.model.Projeto;
 import br.com.erico.sdp.model.StatusProjeto;
@@ -22,30 +21,42 @@ public class ProjetoService {
         this.projetoRepository = projetoRepository;
     }
 
-    public Long adicionarProjeto(ProjetoRequest projeto, Long usuarioId) {
-        log.info("Cadastrando projeto n° {}", projeto.numero());
+    public void adicionarProjeto(Projeto projeto) {
+        log.info("Cadastrando projeto n° {}", projeto.getNumero());
 
-        if (isNumeroProjetoExistente(projeto.numero())) {
+        if (isNumeroProjetoExistente(projeto.getNumero())) {
             log.error("Número de projeto existente");
-            throw new NumeroProjetoExistenteException(projeto.numero());
+            throw new NumeroProjetoExistenteException(projeto.getNumero());
         }
 
-        var p = projetoRepository.save(projeto.toEntity(usuarioId));
-        return p.getId();
+        projetoRepository.save(Projeto.builder()
+                .nome(projeto.getNome())
+                .numero(projeto.getNumero())
+                .modalidade(projeto.getModalidade())
+                .justificativa(projeto.getJustificativa())
+                .impactosAmbientais(projeto.getImpactosAmbientais())
+                .dataCriacao(LocalDate.now())
+                .ano(LocalDate.now().getYear())
+                .usuario(projeto.getUsuario())
+                .eixoTecnologico(projeto.getEixoTecnologico())
+                .status(projeto.getStatus())
+                .build());
     }
 
-    public List<ProjetoResponse> getProjetosByUsuario(Long usuarioId) {
+    public List<ProjetoFromUsuarioDTO> getProjetosByUsuario(Long usuarioId) {
         log.info("Buscando projetos do usuário de ID {}", usuarioId);
 
         return projetoRepository.findAllByUsuarioId(usuarioId)
                 .stream()
-                .map(ProjetoResponse::fromEntity)
+                .map(ProjetoFromUsuarioDTO::new)
                 .toList();
     }
 
-    public ProjetoResponse getProjetoById(Long id) {
+    public ProjetoFromUsuarioDTO getProjetoById(Long id) {
         log.info("Buscando projeto de ID {}", id);
-        return ProjetoResponse.fromEntity(projetoRepository.findById(id).orElseThrow());
+
+        Projeto projeto = projetoRepository.findById(id).orElseThrow();
+        return new ProjetoFromUsuarioDTO(projeto);
     }
 
     public boolean isNumeroProjetoExistente(String numeroProjeto) {

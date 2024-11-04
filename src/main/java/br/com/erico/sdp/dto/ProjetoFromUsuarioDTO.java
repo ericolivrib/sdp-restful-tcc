@@ -15,7 +15,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Relation(collectionRelation = "projetos")
-public record ProjetoResponse(
+public record ProjetoFromUsuarioDTO(
         Long id,
         String nome,
         String numero,
@@ -27,27 +27,18 @@ public record ProjetoResponse(
         StatusProjeto status
 ) {
 
-    public static ProjetoResponse fromEntity(Projeto projeto) {
-        return new ProjetoResponse(
-                projeto.getId(),
-                projeto.getNome(),
-                projeto.getNumero(),
-                projeto.getModalidade(),
-                projeto.getJustificativa(),
-                projeto.getDataCriacao(),
-                projeto.getDataFinalizacao(),
-                projeto.getAno(),
-                projeto.getStatus()
-        );
+    public ProjetoFromUsuarioDTO(Projeto projeto) {
+        this(projeto.getId(), projeto.getNome(), projeto.getNumero(), projeto.getModalidade(), projeto.getJustificativa(),
+                projeto.getDataCriacao(), projeto.getDataFinalizacao(), projeto.getAno(), projeto.getStatus());
     }
 
-    public EntityModel<ProjetoResponse> toEntityModel() {
+    public EntityModel<ProjetoFromUsuarioDTO> toEntityModel() {
         var em = EntityModel.of(this);
         em.add(linkTo(methodOn(ProjetoController.class).getProjetosById(id)).withSelfRel());
 
         switch (status) {
             case NAO_FINALIZADO:
-                em.add(linkTo(methodOn(ProjetoController.class).atualizarProjeto(id, null)).withRel("atualizarProjeto"));
+                em.add(linkTo(methodOn(ProjetoController.class).atualizarProjeto(id, new Projeto())).withRel("atualizarProjeto"));
                 em.add(linkTo(methodOn(ProjetoController.class).deletarProjeto(id)).withRel("deletarProjeto"));
                 em.add(linkTo(methodOn(ProjetoController.class).finalizarProjeto(id)).withRel("finalizarProjeto"));
                 break;
@@ -58,21 +49,6 @@ public record ProjetoResponse(
         }
 
         return em;
-    }
-
-    public static CollectionModel<EntityModel<ProjetoResponse>> toCollectionModel(List<ProjetoResponse> projetos,
-                                                                                  Long usuarioId) {
-        var cm = projetos.stream()
-                .map(ProjetoResponse::toEntityModel)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), CollectionModel::of));
-
-        cm.add(linkTo(methodOn(ProjetoController.class).getProjetosByUsuario(usuarioId)).withSelfRel());
-
-        if (projetos.isEmpty()) {
-            cm.add(linkTo(methodOn(ProjetoController.class).adicionarProjeto(null, usuarioId, null)).withRel("adicionarProjeto"));
-        }
-
-        return cm;
     }
 
 }
