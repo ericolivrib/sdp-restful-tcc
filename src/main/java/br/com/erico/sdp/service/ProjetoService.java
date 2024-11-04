@@ -2,9 +2,12 @@ package br.com.erico.sdp.service;
 
 import br.com.erico.sdp.dto.ProjetoFromUsuarioDTO;
 import br.com.erico.sdp.exception.NumeroProjetoExistenteException;
+import br.com.erico.sdp.exception.UsuarioNaoAutenticadoException;
 import br.com.erico.sdp.model.Projeto;
 import br.com.erico.sdp.model.StatusProjeto;
+import br.com.erico.sdp.model.Usuario;
 import br.com.erico.sdp.repository.ProjetoRepository;
+import br.com.erico.sdp.repository.UsuarioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +19,17 @@ import java.util.List;
 public class ProjetoService {
 
     private final ProjetoRepository projetoRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    public ProjetoService(ProjetoRepository projetoRepository) {
+    public ProjetoService(ProjetoRepository projetoRepository, UsuarioRepository usuarioRepository) {
         this.projetoRepository = projetoRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public void adicionarProjeto(Projeto projeto) {
+        Usuario usuario = usuarioRepository.findById(projeto.getUsuario().getId())
+                .orElseThrow(UsuarioNaoAutenticadoException::new);
+
         log.info("Cadastrando projeto n° {}", projeto.getNumero());
 
         if (isNumeroProjetoExistente(projeto.getNumero())) {
@@ -44,9 +52,12 @@ public class ProjetoService {
     }
 
     public List<ProjetoFromUsuarioDTO> getProjetosByUsuario(Long usuarioId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(UsuarioNaoAutenticadoException::new);
+
         log.info("Buscando projetos do usuário de ID {}", usuarioId);
 
-        return projetoRepository.findAllByUsuarioId(usuarioId)
+        return projetoRepository.findAllByUsuario(usuario)
                 .stream()
                 .map(ProjetoFromUsuarioDTO::new)
                 .toList();
