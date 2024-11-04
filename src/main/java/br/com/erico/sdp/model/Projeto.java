@@ -18,7 +18,6 @@ public class Projeto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-    @Column(unique = true)
     private String numero;
     private String modalidade;
     private String justificativa;
