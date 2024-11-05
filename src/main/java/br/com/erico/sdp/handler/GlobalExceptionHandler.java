@@ -27,8 +27,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Void> handleBadRequest() {
-        return ResponseEntity.badRequest().build();
+    public ResponseEntity<Void> handleNotFound() {
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(NumeroProjetoExistenteException.class)
