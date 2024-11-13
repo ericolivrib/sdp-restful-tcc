@@ -3,11 +3,11 @@ package br.com.erico.sdp.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.CONFLICT)
+@ResponseStatus(code = HttpStatus.CONFLICT, reason = "Número de projeto já existente")
 public class NumeroProjetoExistenteException extends RuntimeException {
 
-    public NumeroProjetoExistenteException(String numeroProjeto) {
-        super("Já existem projetos associados ao número " + numeroProjeto);
+    public NumeroProjetoExistenteException() {
+        super("Número de projeto já existente");
     }
 
 }

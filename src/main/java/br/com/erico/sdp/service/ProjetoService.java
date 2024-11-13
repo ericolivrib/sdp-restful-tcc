@@ -30,25 +30,12 @@ public class ProjetoService {
         Usuario usuario = usuarioRepository.findById(projeto.getUsuario().getId())
                 .orElseThrow(UsuarioNaoAutenticadoException::new);
 
+        if (isNumeroProjetoExistente(projeto.getNumero()))
+            throw new NumeroProjetoExistenteException();
+
         log.info("Cadastrando projeto n° {}", projeto.getNumero());
 
-        if (isNumeroProjetoExistente(projeto.getNumero())) {
-            log.error("Número de projeto existente");
-            throw new NumeroProjetoExistenteException(projeto.getNumero());
-        }
-
-        projetoRepository.save(Projeto.builder()
-                .nome(projeto.getNome())
-                .numero(projeto.getNumero())
-                .modalidade(projeto.getModalidade())
-                .justificativa(projeto.getJustificativa())
-                .impactosAmbientais(projeto.getImpactosAmbientais())
-                .dataCriacao(LocalDate.now())
-                .ano(LocalDate.now().getYear())
-                .usuario(projeto.getUsuario())
-                .eixoTecnologico(projeto.getEixoTecnologico())
-                .status(projeto.getStatus())
-                .build());
+        projetoRepository.save(projeto);
     }
 
     public List<ProjetoFromUsuarioDTO> getProjetosByUsuario(Long usuarioId) {
