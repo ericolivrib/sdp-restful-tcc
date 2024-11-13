@@ -35,6 +35,7 @@ public class ProjetoService {
 
         log.info("Cadastrando projeto n° {}", projeto.getNumero());
 
+        projeto.setNome(projeto.getNome().toUpperCase());
         projeto.setStatus(StatusProjeto.NAO_FINALIZADO);
         projeto.setDataCriacao(LocalDate.now());
         projeto.setAno(LocalDate.now().getYear());
